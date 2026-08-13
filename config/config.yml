@@ -1,0 +1,6 @@
+httpServer:
+  port: "8080"
+  jwtSignKey: "secret"
+
+grpcServer:
+  port: "8081"
