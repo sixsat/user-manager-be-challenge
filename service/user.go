@@ -11,8 +11,10 @@ type userSvc struct {
 	userRepo port.UserRepository
 }
 
-func NewUserService() port.UserService {
-	return &userSvc{}
+func NewUserService(userRepo port.UserRepository) port.UserService {
+	return &userSvc{
+		userRepo: userRepo,
+	}
 }
 
 func (s *userSvc) Create(ctx context.Context, req *domain.CreateUserReq) error {
@@ -20,10 +22,6 @@ func (s *userSvc) Create(ctx context.Context, req *domain.CreateUserReq) error {
 }
 
 func (s *userSvc) GetByID(ctx context.Context, id string) (*domain.GetUserRes, error) {
-	return nil, nil
-}
-
-func (s *userSvc) GetByEmail(ctx context.Context, email string) (*domain.GetUserRes, error) {
 	return nil, nil
 }
 

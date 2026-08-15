@@ -22,13 +22,13 @@ func NewUserRepository(client *mongo.Client) port.UserRepository {
 }
 
 func (r *userRepo) Create(ctx context.Context, req *domain.CreateUserReq) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	_, err := r.collection.InsertOne(ctx, User{
 		Name:         req.Name,
 		Email:        req.Email,
-		PasswordHash: req.Password,
+		PasswordHash: req.PasswordHash,
 		CreatedAt:    time.Now().UTC(),
 	})
 	if err != nil {
@@ -46,7 +46,7 @@ func (r *userRepo) GetByID(ctx context.Context, id string) (*domain.GetUserRes, 
 	return nil, nil
 }
 
-func (r *userRepo) GetByEmail(ctx context.Context, email string) (*domain.GetUserRes, error) {
+func (r *userRepo) GetByEmail(ctx context.Context, email string) (*domain.GetByEmailRes, error) {
 	return nil, nil
 }
 

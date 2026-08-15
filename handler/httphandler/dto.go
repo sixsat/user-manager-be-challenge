@@ -10,8 +10,8 @@ type RegisterUserReq struct {
 
 func (r *RegisterUserReq) toDomain() *domain.RegisterUserReq {
 	return &domain.RegisterUserReq{
-		Name:     r.Name,
-		Email:    r.Email,
-		Password: r.Password,
+		Name:         r.Name,
+		Email:        r.Email,
+		PasswordHash: r.Password,
 	}
 }

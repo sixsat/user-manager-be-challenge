@@ -13,9 +13,9 @@ type User struct {
 }
 
 type CreateUserReq struct {
-	Name     string
-	Email    string
-	Password string
+	Name         string
+	Email        string
+	PasswordHash string
 }
 
 type GetUserRes struct {
@@ -23,6 +23,10 @@ type GetUserRes struct {
 	Name      string
 	Email     string
 	CreatedAt time.Time
+}
+
+type GetByEmailRes struct {
+	PasswordHash string
 }
 
 type UpdateUserReq struct {

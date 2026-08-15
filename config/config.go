@@ -34,7 +34,7 @@ func Load() (*config, error) {
 
 	v.SetConfigName("config")
 	v.SetConfigType("yml")
-	v.AddConfigPath(".")
+	v.AddConfigPath("./config")
 
 	if err := v.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("read config file: %w", err)
