@@ -6,6 +6,7 @@ grpcServer:
 
 jwt:
   signKey: "secret"
+  expiry: 15m
 
 mongo:
   uri: "mongodb://root:secret@mongodb:27017/?authSource=admin"

@@ -1,10 +1,12 @@
 package httphandler
 
 import (
+	"errors"
 	"log/slog"
 	"net/http"
 
 	"github.com/labstack/echo/v5"
+	"github.com/sixsat/user-manager-be-challenge/domain"
 )
 
 func (h *handler) registerUser(c *echo.Context) error {
@@ -39,5 +41,37 @@ func (h *handler) registerUser(c *echo.Context) error {
 }
 
 func (h *handler) loginUser(c *echo.Context) error {
-	return c.JSON(http.StatusOK, "TODO")
+	var req LoginUserReq
+	if err := c.Bind(&req); err != nil {
+		slog.Error("[handler] error binding request", slog.String("error", err.Error()))
+		return c.JSON(http.StatusBadRequest, Res[any]{
+			Code: CodeBadReq,
+			Desc: DescBadReq,
+		})
+	}
+
+	if err := h.validate.Struct(&req); err != nil {
+		slog.Error("[handler] error validating request", slog.String("error", err.Error()))
+		return c.JSON(http.StatusBadRequest, Res[any]{
+			Code: CodeBadReq,
+			Desc: DescBadReq,
+		})
+	}
+
+	res, err := h.authSvc.Login(c.Request().Context(), req.toDomain())
+	if err != nil {
+		if errors.Is(err, domain.ErrInvalidCredentials) {
+			return c.JSON(http.StatusUnauthorized, Res[any]{
+				Code: domain.ErrInvalidCredentials.Code,
+				Desc: domain.ErrInvalidCredentials.Desc,
+			})
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, Res[LoginUserRes]{
+		Code: CodeOK,
+		Desc: DescOK,
+		Data: &LoginUserRes{AccessToken: res.AccessToken},
+	})
 }

@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -22,7 +23,8 @@ type GRPCServer struct {
 }
 
 type JWT struct {
-	SignKey string `mapstructure:"signKey"`
+	SignKey string        `mapstructure:"signKey"`
+	Expiry  time.Duration `mapstructure:"expiry"`
 }
 
 type Mongo struct {

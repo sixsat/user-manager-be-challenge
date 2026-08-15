@@ -42,7 +42,7 @@ func main() {
 
 	userRepo := mongodb.NewUserRepository(mongoClient)
 
-	authSvc := service.NewAuthService(userRepo)
+	authSvc := service.NewAuthService(userRepo, cfg.JWT.SignKey, cfg.JWT.Expiry)
 
 	e := infra.NewHTTPServer()
 	httphandler.

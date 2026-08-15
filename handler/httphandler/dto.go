@@ -15,3 +15,19 @@ func (r *RegisterUserReq) toDomain() *domain.RegisterUserReq {
 		PasswordHash: r.Password,
 	}
 }
+
+type LoginUserReq struct {
+	Email    string `json:"email"    validate:"email"`
+	Password string `json:"password" validate:"required"`
+}
+
+func (r *LoginUserReq) toDomain() *domain.LoginUserReq {
+	return &domain.LoginUserReq{
+		Email:    r.Email,
+		Password: r.Password,
+	}
+}
+
+type LoginUserRes struct {
+	AccessToken string `json:"access_token"`
+}

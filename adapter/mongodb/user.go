@@ -2,12 +2,14 @@ package mongodb
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
 
 	"github.com/sixsat/user-manager-be-challenge/domain"
 	"github.com/sixsat/user-manager-be-challenge/port"
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
@@ -33,7 +35,7 @@ func (r *userRepo) Create(ctx context.Context, req *domain.CreateUserReq) error 
 	})
 	if err != nil {
 		if mongo.IsDuplicateKeyError(err) {
-			return domain.ErrUserAlreadyExists
+			return domain.ErrDuplicateUser
 		}
 		slog.Error("[mongodb] error inserting user", slog.String("error", err.Error()))
 		return fmt.Errorf("insert user: %w", err)
@@ -46,8 +48,24 @@ func (r *userRepo) GetByID(ctx context.Context, id string) (*domain.GetUserRes, 
 	return nil, nil
 }
 
-func (r *userRepo) GetByEmail(ctx context.Context, email string) (*domain.GetByEmailRes, error) {
-	return nil, nil
+func (r *userRepo) GetByEmail(ctx context.Context, email string) (*domain.GetUserByEmailRes, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var user User
+	err := r.collection.FindOne(ctx, bson.M{"email": email}).Decode(&user)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, domain.ErrUserNotFound
+		}
+		slog.Error("[mongodb] error finding user by email", slog.String("error", err.Error()))
+		return nil, fmt.Errorf("find user by email: %w", err)
+	}
+
+	return &domain.GetUserByEmailRes{
+		ID:           user.ID.Hex(),
+		PasswordHash: user.PasswordHash,
+	}, nil
 }
 
 func (r *userRepo) List(ctx context.Context) ([]domain.GetUserRes, error) {

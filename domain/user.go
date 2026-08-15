@@ -25,7 +25,8 @@ type GetUserRes struct {
 	CreatedAt time.Time
 }
 
-type GetByEmailRes struct {
+type GetUserByEmailRes struct {
+	ID           string
 	PasswordHash string
 }
 
