@@ -9,7 +9,7 @@ const (
 	DescInternalErr = "internal server error"
 )
 
-type res[T any] struct {
+type Res[T any] struct {
 	Code string `json:"code"`
 	Desc string `json:"desc"`
 	Data *T     `json:"data,omitempty"`

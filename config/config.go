@@ -9,15 +9,24 @@ import (
 type config struct {
 	HTTPServer HTTPServer `mapstructure:"httpServer"`
 	GRPCServer GRPCServer `mapstructure:"grpcServer"`
+	JWT        JWT        `mapstructure:"jwt"`
+	Mongo      Mongo      `mapstructure:"mongo"`
 }
 
 type HTTPServer struct {
-	Port       string `mapstructure:"port"`
-	JWTSignKey string `mapstructure:"jwtSignKey"`
+	Port string `mapstructure:"port"`
 }
 
 type GRPCServer struct {
 	Port string `mapstructure:"port"`
+}
+
+type JWT struct {
+	SignKey string `mapstructure:"signKey"`
+}
+
+type Mongo struct {
+	URI string `mapstructure:"uri"`
 }
 
 func Load() (*config, error) {
@@ -28,12 +37,12 @@ func Load() (*config, error) {
 	v.AddConfigPath(".")
 
 	if err := v.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("reading config file: %w", err)
+		return nil, fmt.Errorf("read config file: %w", err)
 	}
 
 	var cfg config
 	if err := v.Unmarshal(&cfg); err != nil {
-		return nil, fmt.Errorf("unmarshaling config: %w", err)
+		return nil, fmt.Errorf("unmarshal config: %w", err)
 	}
 
 	return &cfg, nil

@@ -10,8 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/readpref"
 )
 
-func ConnectMongoDB() (*mongo.Client, error) {
-	client, err := mongo.Connect(options.Client().ApplyURI("mongodb://localhost:27017"))
+func ConnectMongoDB(uri string) (*mongo.Client, error) {
+	client, err := mongo.Connect(options.Client().ApplyURI(uri))
 	if err != nil {
 		return nil, fmt.Errorf("connect mongo: %w", err)
 	}

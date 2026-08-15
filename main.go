@@ -8,8 +8,12 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-playground/validator/v10"
+	"github.com/sixsat/user-manager-be-challenge/adapter/mongodb"
 	"github.com/sixsat/user-manager-be-challenge/config"
+	"github.com/sixsat/user-manager-be-challenge/handler/httphandler"
 	"github.com/sixsat/user-manager-be-challenge/infra"
+	"github.com/sixsat/user-manager-be-challenge/service"
 )
 
 func main() {
@@ -19,7 +23,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	mongoClient, err := infra.ConnectMongoDB()
+	mongoClient, err := infra.ConnectMongoDB(cfg.Mongo.URI)
 	if err != nil {
 		slog.Error("error connecting mongodb", slog.String("error", err.Error()))
 		os.Exit(1)
@@ -36,7 +40,15 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	infra.StartHTTPServer(ctx, cfg.HTTPServer)
+	userRepo := mongodb.NewUserRepository(mongoClient)
+
+	authSvc := service.NewAuthService(userRepo)
+
+	e := infra.NewHTTPServer()
+	httphandler.
+		New(cfg.JWT.SignKey, validator.New(validator.WithRequiredStructEnabled()), authSvc).
+		RegisterRoutes(e.Group("/api"))
+	infra.StartHTTPServer(ctx, cfg.HTTPServer, e)
 
 	// TODO: start grpc server
 }

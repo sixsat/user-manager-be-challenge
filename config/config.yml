@@ -1,6 +1,11 @@
 httpServer:
   port: "8080"
-  jwtSignKey: "secret"
 
 grpcServer:
   port: "8081"
+
+jwt:
+  signKey: "secret"
+
+mongo:
+  uri: "mongodb://root:secret@mongodb:27017/?authSource=admin"

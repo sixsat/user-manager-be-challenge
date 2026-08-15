@@ -1,23 +1,27 @@
 package httphandler
 
-import "github.com/labstack/echo/v5"
+import (
+	"net/http"
 
-func createUser(c *echo.Context) error {
-	return c.JSON(201, "TODO")
+	"github.com/labstack/echo/v5"
+)
+
+func (h *handler) createUser(c *echo.Context) error {
+	return c.JSON(http.StatusCreated, "TODO")
 }
 
-func listUsers(c *echo.Context) error {
-	return c.JSON(200, "TODO")
+func (h *handler) listUsers(c *echo.Context) error {
+	return c.JSON(http.StatusOK, "TODO")
 }
 
-func getUserByID(c *echo.Context) error {
-	return c.JSON(200, "TODO")
+func (h *handler) getUserByID(c *echo.Context) error {
+	return c.JSON(http.StatusOK, "TODO")
 }
 
-func updateUser(c *echo.Context) error {
-	return c.JSON(200, "TODO")
+func (h *handler) updateUser(c *echo.Context) error {
+	return c.JSON(http.StatusOK, "TODO")
 }
 
-func deleteUser(c *echo.Context) error {
-	return c.JSON(204, "TODO")
+func (h *handler) deleteUser(c *echo.Context) error {
+	return c.JSON(http.StatusNoContent, "TODO")
 }

@@ -2,25 +2,30 @@ package infra
 
 import (
 	"context"
+	"errors"
 	"log/slog"
+	"net/http"
 	"os"
 	"time"
 
 	"github.com/labstack/echo/v5"
 	"github.com/labstack/echo/v5/middleware"
 	"github.com/sixsat/user-manager-be-challenge/config"
+	"github.com/sixsat/user-manager-be-challenge/domain"
 	"github.com/sixsat/user-manager-be-challenge/handler/httphandler"
 )
 
-func StartHTTPServer(ctx context.Context, cfg config.HTTPServer) {
+func NewHTTPServer() *echo.Echo {
 	e := echo.New()
 	e.Use(
 		middleware.RequestLogger(),
 		middleware.Recover(),
 	)
+	e.HTTPErrorHandler = httpErrorHandler
+	return e
+}
 
-	httphandler.HandleRoutes(e.Group("/api"), cfg.JWTSignKey)
-
+func StartHTTPServer(ctx context.Context, cfg config.HTTPServer, e *echo.Echo) {
 	sc := echo.StartConfig{
 		Address:         ":" + cfg.Port,
 		HideBanner:      true,
@@ -36,6 +41,23 @@ func StartHTTPServer(ctx context.Context, cfg config.HTTPServer) {
 	slog.Info("http server stopped")
 }
 
-func StartGRPCServer(ctx context.Context, cfg config.GRPCServer) {
-	// TODO: impl
+func httpErrorHandler(c *echo.Context, err error) {
+	if resp, err := echo.UnwrapResponse(c.Response()); err == nil {
+		if resp.Committed {
+			return
+		}
+	}
+
+	if err, ok := errors.AsType[domain.BizErr](err); ok {
+		_ = c.JSON(http.StatusConflict, httphandler.Res[any]{
+			Code: err.Code,
+			Desc: err.Desc,
+		})
+		return
+	}
+
+	_ = c.JSON(http.StatusInternalServerError, httphandler.Res[any]{
+		Code: httphandler.CodeInternalErr,
+		Desc: httphandler.DescInternalErr,
+	})
 }
