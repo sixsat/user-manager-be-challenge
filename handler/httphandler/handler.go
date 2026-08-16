@@ -45,13 +45,13 @@ func (h *handler) RegisterRoutes(g *echo.Group) {
 				Desc: DescBadReq,
 			})
 		},
-		SigningKey:    h.jwtSignKey,
+		SigningKey:    []byte(h.jwtSignKey),
 		SigningMethod: jwt.SigningMethodHS256.Name,
 		TokenLookup:   "header:Authorization:Bearer ",
 	}))
 	{
-		users.POST("/", h.createUser)
-		users.GET("/", h.listUsers)
+		users.POST("", h.createUser)
+		users.GET("", h.listUsers)
 		users.GET("/:id", h.getUserByID)
 		users.PATCH("/:id", h.updateUser)
 		users.DELETE("/:id", h.deleteUser)

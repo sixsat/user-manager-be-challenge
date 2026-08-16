@@ -35,7 +35,7 @@ func (s *authSvc) Register(ctx context.Context, req *domain.RegisterUserReq) err
 	}
 
 	err = s.userRepo.Create(ctx, &domain.CreateUserReq{
-		Name:         req.Name,
+		Name:         strings.TrimSpace(req.Name),
 		Email:        strings.ToLower(strings.TrimSpace(req.Email)),
 		PasswordHash: string(passwordBytes),
 	})
@@ -43,7 +43,7 @@ func (s *authSvc) Register(ctx context.Context, req *domain.RegisterUserReq) err
 		if errors.Is(err, domain.ErrDuplicateUser) {
 			return domain.ErrUserAlreadyExists
 		}
-		slog.Error("[service] error creating user", slog.String("error", err.Error()))
+		slog.Error("[service] error registering user", slog.String("error", err.Error()))
 		return err
 	}
 
