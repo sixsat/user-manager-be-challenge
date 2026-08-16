@@ -14,13 +14,20 @@ type handler struct {
 	jwtSignKey string
 	validate   *validator.Validate
 	authSvc    port.AuthService
+	userSvc    port.UserService
 }
 
-func New(jwtSignKey string, validate *validator.Validate, authSvc port.AuthService) *handler {
+func New(
+	jwtSignKey string,
+	validate *validator.Validate,
+	authSvc port.AuthService,
+	userSvc port.UserService,
+) *handler {
 	return &handler{
 		jwtSignKey: jwtSignKey,
 		validate:   validate,
 		authSvc:    authSvc,
+		userSvc:    userSvc,
 	}
 }
 

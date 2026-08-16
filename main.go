@@ -43,10 +43,16 @@ func main() {
 	userRepo := mongodb.NewUserRepository(mongoClient)
 
 	authSvc := service.NewAuthService(userRepo, cfg.JWT.SignKey, cfg.JWT.Expiry)
+	userSvc := service.NewUserService(userRepo)
 
 	e := infra.NewHTTPServer()
 	httphandler.
-		New(cfg.JWT.SignKey, validator.New(validator.WithRequiredStructEnabled()), authSvc).
+		New(
+			cfg.JWT.SignKey,
+			validator.New(validator.WithRequiredStructEnabled()),
+			authSvc,
+			userSvc,
+		).
 		RegisterRoutes(e.Group("/api"))
 	infra.StartHTTPServer(ctx, cfg.HTTPServer, e)
 
