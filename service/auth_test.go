@@ -191,6 +191,32 @@ func TestAuthServiceLogin(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("fail signing token error", func(t *testing.T) {
+		originalSigningMethod := jwt.SigningMethodHS256
+		jwt.SigningMethodHS256 = &jwt.SigningMethodHMAC{Name: originalSigningMethod.Name}
+		t.Cleanup(func() {
+			jwt.SigningMethodHS256 = originalSigningMethod
+		})
+		repo := mock.NewMockUserRepository(gomock.NewController(t))
+		svc := NewAuthService(repo, signKey, jwtExpiry)
+		repo.EXPECT().GetByEmail(gomock.Any(), "jane@example.com").Return(&domain.GetUserByEmailRes{
+			ID:           userID,
+			PasswordHash: hashPassword(t, password),
+		}, nil)
+
+		res, err := svc.Login(context.Background(), &domain.LoginUserReq{
+			Email:    "jane@example.com",
+			Password: password,
+		})
+
+		if res != nil {
+			t.Fatalf("Login() response = %#v, want nil", res)
+		}
+		if !errors.Is(err, jwt.ErrHashUnavailable) {
+			t.Fatalf("Login() error = %v, want %v", err, jwt.ErrHashUnavailable)
+		}
+	})
 }
 
 func hashPassword(t *testing.T, password string) string {
