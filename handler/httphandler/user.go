@@ -64,7 +64,7 @@ func (h *handler) getUserByID(c *echo.Context) error {
 	user, err := h.userSvc.GetByID(c.Request().Context(), req.ID)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {
-			ResNotFound(c)
+			return ResNotFound(c)
 		}
 		return err
 	}
@@ -100,7 +100,7 @@ func (h *handler) updateUser(c *echo.Context) error {
 
 	if err := h.userSvc.Update(c.Request().Context(), req.toDomain()); err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {
-			ResNotFound(c)
+			return ResNotFound(c)
 		}
 		return err
 	}
@@ -120,7 +120,7 @@ func (h *handler) deleteUser(c *echo.Context) error {
 
 	if err := h.userSvc.Delete(c.Request().Context(), req.ID); err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {
-			ResNotFound(c)
+			return ResNotFound(c)
 		}
 		return err
 	}

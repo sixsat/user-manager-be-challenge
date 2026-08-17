@@ -14,19 +14,13 @@ func (h *handler) registerUser(c *echo.Context) error {
 	err := c.Bind(&req)
 	if err != nil {
 		slog.Error("[handler] error binding request", slog.String("error", err.Error()))
-		return c.JSON(http.StatusBadRequest, Res[any]{
-			Code: CodeBadReq,
-			Desc: DescBadReq,
-		})
+		return ResBadRequest(c)
 	}
 
 	err = h.validate.Struct(&req)
 	if err != nil {
 		slog.Error("[handler] error validating request", slog.String("error", err.Error()))
-		return c.JSON(http.StatusBadRequest, Res[any]{
-			Code: CodeBadReq,
-			Desc: DescBadReq,
-		})
+		return ResBadRequest(c)
 	}
 
 	err = h.authSvc.Register(c.Request().Context(), req.toDomain())
@@ -44,18 +38,12 @@ func (h *handler) loginUser(c *echo.Context) error {
 	var req LoginUserReq
 	if err := c.Bind(&req); err != nil {
 		slog.Error("[handler] error binding request", slog.String("error", err.Error()))
-		return c.JSON(http.StatusBadRequest, Res[any]{
-			Code: CodeBadReq,
-			Desc: DescBadReq,
-		})
+		return ResBadRequest(c)
 	}
 
 	if err := h.validate.Struct(&req); err != nil {
 		slog.Error("[handler] error validating request", slog.String("error", err.Error()))
-		return c.JSON(http.StatusBadRequest, Res[any]{
-			Code: CodeBadReq,
-			Desc: DescBadReq,
-		})
+		return ResBadRequest(c)
 	}
 
 	res, err := h.authSvc.Login(c.Request().Context(), req.toDomain())
