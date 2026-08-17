@@ -61,6 +61,11 @@ func (h *handler) getUserByID(c *echo.Context) error {
 		return ResBadRequest(c)
 	}
 
+	if err := h.validate.Struct(&req); err != nil {
+		slog.Error("[handler] error validating request", slog.String("error", err.Error()))
+		return ResBadRequest(c)
+	}
+
 	user, err := h.userSvc.GetByID(c.Request().Context(), req.ID)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {
@@ -115,6 +120,11 @@ func (h *handler) deleteUser(c *echo.Context) error {
 	var req DeleteUserReq
 	if err := c.Bind(&req); err != nil {
 		slog.Error("[handler] error binding request", slog.String("error", err.Error()))
+		return ResBadRequest(c)
+	}
+
+	if err := h.validate.Struct(&req); err != nil {
+		slog.Error("[handler] error validating request", slog.String("error", err.Error()))
 		return ResBadRequest(c)
 	}
 
