@@ -164,5 +164,13 @@ func (r *userRepo) Delete(ctx context.Context, id string) error {
 }
 
 func (r *userRepo) Count(ctx context.Context) (int, error) {
-	return 0, nil
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	count, err := r.collection.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		slog.Error("[mongodb] error counting users", slog.String("error", err.Error()))
+		return 0, fmt.Errorf("count users: %w", err)
+	}
+	return int(count), nil
 }

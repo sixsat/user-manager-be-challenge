@@ -17,6 +17,8 @@ import (
 )
 
 func main() {
+	infra.InitLogger()
+
 	cfg, err := config.Load()
 	if err != nil {
 		slog.Error("error loading config", slog.String("error", err.Error()))
@@ -54,7 +56,9 @@ func main() {
 			userSvc,
 		).
 		RegisterRoutes(e.Group("/api"))
-	infra.StartHTTPServer(ctx, cfg.HTTPServer, e)
 
+	go infra.StartHTTPServer(ctx, cfg.HTTPServer, e)
+
+	infra.StartBackgroundJob(ctx, userSvc)
 	// TODO: start grpc server
 }

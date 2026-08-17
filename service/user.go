@@ -99,5 +99,10 @@ func (s *userSvc) Delete(ctx context.Context, id string) error {
 }
 
 func (s *userSvc) Count(ctx context.Context) (int, error) {
-	return 0, nil
+	count, err := s.userRepo.Count(ctx)
+	if err != nil {
+		slog.Error("[service] error counting users", slog.String("error", err.Error()))
+		return 0, err
+	}
+	return count, nil
 }
