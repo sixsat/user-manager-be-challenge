@@ -35,7 +35,7 @@ func (s *userSvc) Create(ctx context.Context, req *domain.CreateUserReq) error {
 	})
 	if err != nil {
 		if errors.Is(err, domain.ErrDuplicateUser) {
-			return domain.ErrUserAlreadyExists
+			return domain.BizErrUserAlreadyExists
 		}
 		slog.Error("[service] error creating user", slog.String("error", err.Error()))
 		return err
@@ -77,7 +77,7 @@ func (s *userSvc) Update(ctx context.Context, req *domain.UpdateUserReq) error {
 	err := s.userRepo.Update(ctx, req)
 	if err != nil {
 		if errors.Is(err, domain.ErrDuplicateUser) {
-			return domain.ErrUserAlreadyExists
+			return domain.BizErrUserAlreadyExists
 		}
 		if !errors.Is(err, domain.ErrUserNotFound) {
 			slog.Error("[service] error updating user", slog.String("error", err.Error()))

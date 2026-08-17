@@ -41,7 +41,7 @@ func (s *authSvc) Register(ctx context.Context, req *domain.RegisterUserReq) err
 	})
 	if err != nil {
 		if errors.Is(err, domain.ErrDuplicateUser) {
-			return domain.ErrUserAlreadyExists
+			return domain.BizErrUserAlreadyExists
 		}
 		slog.Error("[service] error registering user", slog.String("error", err.Error()))
 		return err
@@ -54,7 +54,7 @@ func (s *authSvc) Login(ctx context.Context, req *domain.LoginUserReq) (*domain.
 	user, err := s.userRepo.GetByEmail(ctx, strings.ToLower(strings.TrimSpace(req.Email)))
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {
-			return nil, domain.ErrInvalidCredentials
+			return nil, domain.BizErrInvalidCredentials
 		}
 		slog.Error("[service] error getting user by email", slog.String("error", err.Error()))
 		return nil, err
@@ -63,7 +63,7 @@ func (s *authSvc) Login(ctx context.Context, req *domain.LoginUserReq) (*domain.
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return nil, domain.ErrInvalidCredentials
+			return nil, domain.BizErrInvalidCredentials
 		}
 		slog.Error("[service] error comparing password hash", slog.String("error", err.Error()))
 		return nil, err

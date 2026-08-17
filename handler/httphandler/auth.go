@@ -48,10 +48,10 @@ func (h *handler) loginUser(c *echo.Context) error {
 
 	res, err := h.authSvc.Login(c.Request().Context(), req.toDomain())
 	if err != nil {
-		if errors.Is(err, domain.ErrInvalidCredentials) {
+		if errors.Is(err, domain.BizErrInvalidCredentials) {
 			return c.JSON(http.StatusUnauthorized, Res[any]{
-				Code: domain.ErrInvalidCredentials.Code,
-				Desc: domain.ErrInvalidCredentials.Desc,
+				Code: domain.BizErrInvalidCredentials.Code,
+				Desc: domain.BizErrInvalidCredentials.Desc,
 			})
 		}
 		return err

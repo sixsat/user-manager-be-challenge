@@ -15,8 +15,8 @@ func (e BizErr) Error() string {
 }
 
 var (
-	ErrUserAlreadyExists  = BizErr{Code: "0002", Desc: "user already exists"}
-	ErrInvalidCredentials = BizErr{Code: "0003", Desc: "invalid email or password"}
+	BizErrUserAlreadyExists  = BizErr{Code: "0002", Desc: "user already exists"}
+	BizErrInvalidCredentials = BizErr{Code: "0003", Desc: "invalid email or password"}
 
 	ErrDuplicateUser = errors.New("duplicate user")
 	ErrUserNotFound  = errors.New("user not found")
