@@ -11,8 +11,10 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/sixsat/user-manager-be-challenge/adapter/mongodb"
 	"github.com/sixsat/user-manager-be-challenge/config"
+	"github.com/sixsat/user-manager-be-challenge/handler/grpchandler"
 	"github.com/sixsat/user-manager-be-challenge/handler/httphandler"
 	"github.com/sixsat/user-manager-be-challenge/infra"
+	userproto "github.com/sixsat/user-manager-be-challenge/proto"
 	"github.com/sixsat/user-manager-be-challenge/service"
 )
 
@@ -46,19 +48,22 @@ func main() {
 
 	authSvc := service.NewAuthService(userRepo, cfg.JWT.SignKey, cfg.JWT.Expiry)
 	userSvc := service.NewUserService(userRepo)
+	validate := validator.New(validator.WithRequiredStructEnabled())
 
 	e := infra.NewHTTPServer()
 	httphandler.
 		New(
 			cfg.JWT.SignKey,
-			validator.New(validator.WithRequiredStructEnabled()),
+			validate,
 			authSvc,
 			userSvc,
 		).
 		RegisterRoutes(e.Group("/api"))
-
 	go infra.StartHTTPServer(ctx, cfg.HTTPServer, e)
 
+	grpcServer := infra.NewGRPCServer(cfg.JWT.SignKey)
+	userproto.RegisterUserServiceServer(grpcServer, grpchandler.New(validate, userSvc))
+	go infra.StartGRPCServer(ctx, cfg.GRPCServer, grpcServer)
+
 	infra.StartBackgroundJob(ctx, userSvc)
-	// TODO: start grpc server
 }

@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package userproto;
+
+option go_package = "github.com/sixsat/user-manager-be-challenge/proto;userproto";
+
+import "google/protobuf/timestamp.proto";
+
+service UserService {
+  rpc CreateUser(CreateUserReq) returns (CreateUserRes);
+  rpc GetUser(GetUserReq) returns (GetUserRes);
+}
+
+message CreateUserReq {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message CreateUserRes {}
+
+message GetUserReq {
+  string id = 1;
+}
+
+message GetUserRes {
+  User user = 1;
+}
+
+message User {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  google.protobuf.Timestamp created_at = 4;
+}
